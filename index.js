@@ -28,9 +28,9 @@ const ROBLOX_TOKEN_SCOPE_MAP = {
     'Bool Color': [ 'constant.language' ],
     '"nil" Color': [ 'constant.language' ],
     'Function Name Color': [ 'variable.function' ],
-    '"function" Color': [ 'keyword' ],
+    '"function" Color': [ 'variable.parameter.function.language.special', 'variable', 'keyword' ],
     '"local" Color': ['keyword'],
-    '"self" Color': [ 'variable.instance', 'keyword', 'variable' ],
+    '"self" Color': [ 'variable.instance', 'variable.language', 'support', 'keyword', 'variable' ],
     'Luau Keyword Color': [ 'variable' ],
     'Keyword Color': [ 'keyword' ],
     'Built-in Function Color': [ 'support.function', 'entity.name', 'entity.other' ],
@@ -64,14 +64,16 @@ const getScopeColors = (theme) => {
     for (const token of theme.tokenColors) {
         const color = token.settings.foreground
 
-        // The token scope can either be an array of strings, or a string. This
-        // handles both cases.
-        if (Array.isArray(token.scope)) {
-            for (const scope of token.scope) {
-                colors[scope] = color
+        if (color) {
+            // The token scope can either be an array of strings, or a string. This
+            // handles both cases.
+            if (Array.isArray(token.scope)) {
+                for (const scope of token.scope) {
+                    colors[scope] = color
+                }
+            } else {
+                colors[token.scope] = color
             }
-        } else {
-            colors[token.scope] = color
         }
     }
 
