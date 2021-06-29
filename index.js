@@ -20,7 +20,7 @@ const ROBLOX_VSCODE_THEME_MAP = {
 }
 
 const ROBLOX_TOKEN_SCOPE_MAP = {
-    'Text Color': [ 'variable', 'variable.object', 'variable.other', 'variable.parameter', 'support' ],
+    'Text Color': [ 'string.unquoted', 'variable', 'variable.object', 'variable.other', 'variable.parameter', 'support' ],
     'Operator Color': [ 'keyword.operator' ],
     'Number Color': [ 'constant.numeric' ],
     'String Color': [ 'string', 'string.quoted' ],
@@ -29,12 +29,12 @@ const ROBLOX_TOKEN_SCOPE_MAP = {
     '"nil" Color': [ 'constant.language' ],
     'Function Name Color': [ 'variable.function' ],
     '"function" Color': [ 'keyword' ],
-    '"local" Color': [ 'keyword' ],
-    '"self" Color': [ 'keyword', 'variable.instance', 'variable.other.instance', 'variable' ],
+    '"local" Color': ['keyword'],
+    '"self" Color': [ 'variable.instance', 'keyword', 'variable' ],
     'Luau Keyword Color': [ 'variable' ],
     'Keyword Color': [ 'keyword' ],
     'Built-in Function Color': [ 'support.function', 'entity.name', 'entity.other' ],
-    '"TODO" Color': [ 'keyword' ],
+    '"TODO" Color': [ 'variable', 'keyword' ],
     'Method Color': [ 'variable.function' ],
     'Property Color': [ 'variable.function' ],
 }
@@ -57,32 +57,51 @@ const getBaseColors = (theme) => {
     return colors
 }
 
-const getTokenColors = (theme) => {
-    let colors = {}
+// Returns a dictionary that maps each scope to its associated color.
+const getScopeColors = (theme) => {
+    const colors = {}
 
-    const global = theme.tokenColors.find(token => token.scope === undefined)
+    for (const token of theme.tokenColors) {
+        const color = token.settings.foreground
 
-    for (const [studioName, scope] of Object.entries(ROBLOX_TOKEN_SCOPE_MAP)) {
-        const token = theme.tokenColors.find(token => {
-            if (Array.isArray(token.scope)) {
-                for (const value of scope) {
-                    if (token.scope.includes(value)) {
-                        return true
-                    }
-                }
-                return false
-            } else {
-                return scope.includes(token.scope)
+        // The token scope can either be an array of strings, or a string. This
+        // handles both cases.
+        if (Array.isArray(token.scope)) {
+            for (const scope of token.scope) {
+                colors[scope] = color
             }
-        })
-
-        if (token && token.settings?.foreground) {
-            colors[studioName] = hexRgbAsArray(token.settings.foreground)
         } else {
-            console.warn('No color for ' + studioName)
+            colors[token.scope] = color
+        }
+    }
+
+    return colors
+}
+
+const getTokenColors = (theme) => {
+    const scopeColors = getScopeColors(theme)
+    const colors = {}
+
+    for (const [studioName, scopes] of Object.entries(ROBLOX_TOKEN_SCOPE_MAP)) {
+        let color
+
+        for (const scope of scopes) {
+            const maybeColor = scopeColors[scope]
+            if (maybeColor) {
+                color = maybeColor
+                break
+            }
+        }
+
+        if (color) {
+            colors[studioName] = hexRgbAsArray(color)
+        } else {
+            const global = theme.tokenColors.find(token => token.scope === undefined)
 
             if (global) {
-                colors[studioName] = hexRgbAsArray(global.settings.foreground)
+                color = global.settings.foreground
+            } else {
+                console.warn('No color for ' + studioName)
             }
         }
     }
@@ -90,7 +109,8 @@ const getTokenColors = (theme) => {
     return colors
 }
 
-const theme = JSON5.parse(fs.readFileSync('./theme.json', 'utf8'))
+const themeFile = process.argv[2] || './theme.json'
+const theme = JSON5.parse(fs.readFileSync(themeFile, 'utf8'))
 
 const studioTheme = {
     ...getBaseColors(theme),
