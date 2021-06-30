@@ -111,38 +111,42 @@ const getTokenColors = (theme) => {
     return colors
 }
 
-const themeFile = process.argv[2] || './theme.json'
-const theme = JSON5.parse(fs.readFileSync(themeFile, 'utf8'))
+const convert = (themeFile) => {
+    const theme = JSON5.parse(fs.readFileSync(themeFile, 'utf8'))
 
-const studioTheme = {
-    ...getBaseColors(theme),
-    ...getTokenColors(theme)
+    const studioTheme = {
+        ...getBaseColors(theme),
+        ...getTokenColors(theme)
+    }
+
+    const command = `local ChangeHistoryService = game:GetService("ChangeHistoryService")
+    local json = [[${JSON.stringify(studioTheme)}]]
+    local theme = game.HttpService:JSONDecode(json)
+
+    ChangeHistoryService:SetWaypoint("Changing theme")
+
+    local studio = settings().Studio
+
+    for name, color in pairs(theme) do
+        color = Color3.fromRGB(color[1], color[2], color[3])
+
+        local success = pcall(function()
+            studio[name] = color
+        end)
+
+        if not success then
+            warn(("%s is not a valid theme color"):format(name))
+        end
+    end
+
+    ChangeHistoryService:SetWaypoint("Theme changed")
+
+    print("Successfully changed your Script Editor theme!")
+    `
+
+    console.log('\nCopy the following command into the Studio command bar:\n')
+    console.log(command.replace(/\s+|[\t\r\n]/gm, ' '))
+
 }
 
-const command = `local ChangeHistoryService = game:GetService("ChangeHistoryService")
-local json = [[${JSON.stringify(studioTheme)}]]
-local theme = game.HttpService:JSONDecode(json)
-
-ChangeHistoryService:SetWaypoint("Changing theme")
-
-local studio = settings().Studio
-
-for name, color in pairs(theme) do
-    color = Color3.fromRGB(color[1], color[2], color[3])
-
-    local success = pcall(function()
-        studio[name] = color
-    end)
-
-    if not success then
-        warn(("%s is not a valid theme color"):format(name))
-    end
-end
-
-ChangeHistoryService:SetWaypoint("Theme changed")
-
-print("Successfully changed your Script Editor theme!")
-`
-
-console.log('\nCopy the following command into the Studio command bar:\n')
-console.log(command.replace(/\s+|[\t\r\n]/gm, ' '))
+export default convert

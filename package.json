@@ -5,8 +5,11 @@
   "description": "Converts a Visual Studio Code theme into a compatible Roblox Studio theme",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "./bin/rbxtheme.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "rbxtheme": "bin/rbxtheme.js"
   },
   "keywords": [],
   "author": "David Minnerly",
