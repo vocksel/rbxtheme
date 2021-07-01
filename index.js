@@ -1,3 +1,4 @@
+import chalk from 'chalk'
 import fs from 'fs'
 import JSON5  from 'json5'
 import hexRgb from 'hex-rgb'
@@ -39,6 +40,10 @@ const ROBLOX_TOKEN_SCOPE_MAP = {
     'Property Color': [ 'variable.function' ],
 }
 
+const colorMissing = (colorName) => {
+    console.log(chalk.yellow(`WARN: Could not determine a color for '${colorName}'`))
+}
+
 const hexRgbAsArray = (hex) => {
     const color = hexRgb(hex)
     return [ color.red, color.green, color.blue, color.alpha ]
@@ -51,7 +56,7 @@ const getBaseColors = (theme) => {
         if (color) {
             colors[studioName] = hexRgbAsArray(color)
         } else {
-            console.warn('No color for ' + studioName)
+            colorMissing(studioName)
         }
     }
     return colors
@@ -103,7 +108,7 @@ const getTokenColors = (theme) => {
             if (global) {
                 color = global.settings.foreground
             } else {
-                console.warn('No color for ' + studioName)
+                colorMissing(studioName)
             }
         }
     }
@@ -141,12 +146,9 @@ const convert = (themeFile) => {
 
     ChangeHistoryService:SetWaypoint("Theme changed")
 
-    print("Successfully changed your Script Editor theme!")
-    `
+    print("Successfully changed your Script Editor theme!")`
 
-    console.log('\nCopy the following command into the Studio command bar:\n')
-    console.log(command.replace(/\s+|[\t\r\n]/gm, ' '))
-
+    return command
 }
 
 export default convert
