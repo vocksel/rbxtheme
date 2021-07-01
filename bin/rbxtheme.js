@@ -1,10 +1,9 @@
 #! /usr/bin/env node
+import { program } from 'commander'
 import chalk from 'chalk'
 import clipboardy from 'clipboardy'
 import fs from 'fs'
 import convert from '../index.js'
-
-const themeFile = process.argv[2]
 
 const exit = (message) => {
     console.error(chalk.red(message))
@@ -14,17 +13,23 @@ const exit = (message) => {
 const copiedSuccessfully = () => {
     console.log('Theme copied to clipboard. Paste it into the command bar in Studio to set your Script Editor theme.')
 }
-
-if (themeFile) {
-    if (fs.existsSync(themeFile)) {
-        const command = convert(themeFile)
-        const minified = command.replace(/\s+|[\t\r\n]/gm, ' ')
-        
-        clipboardy.write(minified)
-            .then(copiedSuccessfully)
-    } else {
-        exit(`Could not find a theme file at the path ${themeFile}`)
-    }
-} else {
-    exit('No theme file provided')
-}
+program
+    .version('1.0.0')
+    .argument('<themeFile>', `Path to the theme's json file`)
+    .option('--show-command', `Log the command to the console. Useful if copying to clipboard doesn't work`)
+    .action(async (themeFile, options) => {
+        if (fs.existsSync(themeFile)) {
+            const command = convert(themeFile)
+            const minified = command.replace(/\s+|[\t\r\n]/gm, ' ')
+            
+            await clipboardy.write(minified)
+            copiedSuccessfully()
+            
+            if (options.showCommand) {
+                console.log('\n' + minified)
+            }
+        } else {
+            exit(`Could not find a theme file at the path ${themeFile}`)
+        }
+    })
+    .parse(process.argv)
