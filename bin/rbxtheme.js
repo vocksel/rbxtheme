@@ -9,7 +9,8 @@ import JSON5 from 'json5'
 import path from 'path'
 import convert from '../index.js'
 
-const ISSUES_URL = 'https://github.com/vocksel/roblox-theme-converter/issues'
+const __dirname = path.dirname(import.meta.url.substring(8))
+const pkg = JSON5.parse(await readFile(path.join(__dirname, '../package.json')))
 
 const getAvailableThemes = async () => {
     const extensionsPath = path.join(os.homedir(), '.vscode/extensions/')
@@ -72,7 +73,7 @@ const getThemeFromName = async (themeName) => {
 }
 
 program
-    .version('1.0.0')
+    .version(pkg.version)
     .showHelpAfterError()
 
 program
@@ -93,7 +94,7 @@ program
                 const colorList = missingColors.toString()
         
                 console.log(chalk.yellow(`WARN: Some colors could not be converted: ${colorList}`))
-                console.log(chalk.yellow(`Please submit an issue to ${ISSUES_URL} with a link to the theme `
+                console.log(chalk.yellow(`Please submit an issue to ${pkg.bugs.url} with a link to the theme `
                     + `you are converting.`))
             }
 
