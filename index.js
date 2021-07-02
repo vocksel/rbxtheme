@@ -40,10 +40,6 @@ const ROBLOX_TOKEN_SCOPE_MAP = {
     'Property Color': [ 'variable.function' ],
 }
 
-const colorMissing = (colorName) => {
-    console.log(chalk.yellow(`WARN: Could not determine a color for '${colorName}'`))
-}
-
 const hexRgbAsArray = (hex) => {
     const color = hexRgb(hex)
     return [ color.red, color.green, color.blue, color.alpha ]
@@ -51,15 +47,16 @@ const hexRgbAsArray = (hex) => {
 
 const getBaseColors = (theme) => {
     let colors = {}
+    const missing = []
     for (const [studioName, colorName] of Object.entries(ROBLOX_VSCODE_THEME_MAP)) {
         const color = theme.colors[colorName]
         if (color) {
             colors[studioName] = hexRgbAsArray(color)
         } else {
-            colorMissing(studioName)
+            missing.push(studioName)
         }
     }
-    return colors
+    return [colors, missing]
 }
 
 // Returns a dictionary that maps each scope to its associated color.
@@ -88,6 +85,7 @@ const getScopeColors = (theme) => {
 const getTokenColors = (theme) => {
     const scopeColors = getScopeColors(theme)
     const colors = {}
+    const missing = []
 
     for (const [studioName, scopes] of Object.entries(ROBLOX_TOKEN_SCOPE_MAP)) {
         let color
@@ -108,47 +106,56 @@ const getTokenColors = (theme) => {
             if (global) {
                 color = global.settings.foreground
             } else {
-                colorMissing(studioName)
+                missing.push(studioName)
             }
         }
     }
 
-    return colors
+    return [colors, missing]
 }
 
 const convert = (themeFile) => {
     const theme = JSON5.parse(fs.readFileSync(themeFile, 'utf8'))
 
+    const [baseColors, missingBaseColors] = getBaseColors(theme)
+    const [tokenColors, missingTokenColors] = getTokenColors(theme)
+
     const studioTheme = {
-        ...getBaseColors(theme),
-        ...getTokenColors(theme)
+        ...baseColors,
+        ...tokenColors,
     }
 
+    const missingColors = [
+        ...missingBaseColors,
+        ...missingTokenColors
+    ]
+
     const command = `local ChangeHistoryService = game:GetService("ChangeHistoryService")
-    local json = [[${JSON.stringify(studioTheme)}]]
-    local theme = game.HttpService:JSONDecode(json)
 
-    ChangeHistoryService:SetWaypoint("Changing theme")
+local json = [[${JSON.stringify(studioTheme)}]]
+local theme = game.HttpService:JSONDecode(json)
 
-    local studio = settings().Studio
+ChangeHistoryService:SetWaypoint("Changing theme")
 
-    for name, color in pairs(theme) do
-        color = Color3.fromRGB(color[1], color[2], color[3])
+local studio = settings().Studio
 
-        local success = pcall(function()
-            studio[name] = color
-        end)
+for name, color in pairs(theme) do
+    color = Color3.fromRGB(color[1], color[2], color[3])
 
-        if not success then
-            warn(("%s is not a valid theme color"):format(name))
-        end
+    local success = pcall(function()
+        studio[name] = color
+    end)
+
+    if not success then
+        warn(("%s is not a valid theme color"):format(name))
     end
+end
 
-    ChangeHistoryService:SetWaypoint("Theme changed")
+ChangeHistoryService:SetWaypoint("Theme changed")
 
-    print("Successfully changed your Script Editor theme!")`
+print("Successfully changed your Script Editor theme!")`
 
-    return command
+    return [command, missingColors]
 }
 
 export default convert
