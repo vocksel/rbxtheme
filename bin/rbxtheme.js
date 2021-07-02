@@ -88,6 +88,14 @@ program
         if (fs.existsSync(themePath)) {
             const [command, missingColors] = convert(themePath)
             const minified = command.replace(/\s+|[\t\r\n]/gm, ' ')
+            
+            if (missingColors.length > 0) {
+                const colorList = missingColors.toString()
+        
+                console.log(chalk.yellow(`WARN: Some colors could not be converted: ${colorList}`))
+                console.log(chalk.yellow(`Please submit an issue to ${ISSUES_URL} with a link to the theme `
+                    + `you are converting.`))
+            }
 
             if (options.clipboard) {
                 await clipboardy.write(minified)
@@ -101,14 +109,6 @@ program
                 } else {
                     console.log('\n' + minified)
                 }
-            }
-
-            if (missingColors.length > 0) {
-                const colorList = missingColors.toString()
-        
-                console.log(chalk.yellow(`\nWARN: Some colors could not be converted: ${colorList}`))
-                console.log(chalk.yellow(`Please submit an issue to ${ISSUES_URL} with a link to the theme `
-                    + `you are converting.`))
             }
         } else {
             console.log(chalk.red(`Could not find a theme file named '${theme}'`))
