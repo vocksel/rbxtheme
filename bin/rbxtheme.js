@@ -9,6 +9,7 @@ program
     .version('1.0.0')
     .argument('<themeFile>', `Path to the theme's json file. These can be found in ~/.vscode/extensions`)
     .option('-c, --clipboard', 'Copy the generated command to the clipboard automatically')
+    .option('-e, --expanded', 'Log the Studio command in its non-minified form')
     .showHelpAfterError()
     .action(async (themeFile, options) => {
         if (fs.existsSync(themeFile)) {
@@ -21,7 +22,12 @@ program
                     'Script Editor theme.')
             } else {
                 console.log('Copy/paste this command into the command bar in Studio to set your Script Editor theme')
+                
+                if (options.expanded) {
+                    console.log('\n' + command)
+                } else {
                 console.log('\n' + minified)
+            }
             }
         } else {
             console.log(chalk.red(`Could not find a theme file at the path '${themeFile}'`))
