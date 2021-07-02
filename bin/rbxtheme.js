@@ -7,7 +7,7 @@ import fs from 'fs'
 import { readdir, stat, readFile } from 'fs/promises'
 import JSON5 from 'json5'
 import path from 'path'
-import convert from '../index.js'
+import convert from '../src/index.js'
 
 const __dirname = path.dirname(import.meta.url.substring(8))
 const pkg = JSON5.parse(await readFile(path.join(__dirname, '../package.json')))
