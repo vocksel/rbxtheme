@@ -28,8 +28,8 @@ program
                 if (options.expanded) {
                     console.log('\n' + command)
                 } else {
-                console.log('\n' + minified)
-            }
+                    console.log('\n' + minified)
+                }
             }
 
             if (missingColors.length > 0) {
