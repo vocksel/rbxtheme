@@ -1,7 +1,7 @@
 {
   "name": "roblox-theme-converter",
   "type": "module",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Converts a Visual Studio Code theme into a compatible Roblox Studio theme",
   "main": "src/index.js",
   "scripts": {
