@@ -21,7 +21,7 @@ $ rbxtheme list
 After picking a theme, run it through `rbxtheme` to convert it into a command that you can run from Roblox Studio.
 
 ```sh
-$ rbxtheme "Synthwave '84"
+$ rbxtheme convert "Synthwave '84"
 # Use the --copy flag to have the command copied to your clipboard
-$ rbxtheme --copy "Synthwave '85"
+$ rbxtheme convert --copy "Synthwave '85"
 ```
