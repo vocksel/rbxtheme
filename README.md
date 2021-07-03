@@ -9,7 +9,7 @@ Install the package globally to get access to the `rbxtheme` command.
 ```sh
 $ npm install -g roblox-theme-converter
 # Or
-$ yarn global add roblox-theme-converted
+$ yarn global add roblox-theme-converter
 ```
 
 Then you can view the list of all the available themes.
