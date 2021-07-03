@@ -1,5 +1,5 @@
 {
-  "name": "vscode-theme-to-studio",
+  "name": "roblox-theme-converter",
   "type": "module",
   "version": "1.0.0",
   "description": "Converts a Visual Studio Code theme into a compatible Roblox Studio theme",
