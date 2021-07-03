@@ -37,51 +37,42 @@ export const getAvailableThemes = async () => {
     const extensionsPath = path.join(os.homedir(), '.vscode/extensions/')
     const extensions = await readdir(extensionsPath)
 
-    const themes = []
+    const availableThemes = []
 
     for (const extension of extensions) {
         const extensionPath = path.join(extensionsPath, extension)
         const stats = await stat(extensionPath)
 
         if (stats.isDirectory()) {
-            const items = await readdir(extensionPath)
-            const themesFolder = items.find(item => item === 'themes') 
+            let file
+            try {
+                file = await readFile(path.join(extensionPath, 'package.json'))
+            } catch (e) {
+                // ignore
+            }
 
-            if (themesFolder) {
-                const themesPath = path.join(extensionPath, 'themes')
-                const themeFiles = await readdir(themesPath)
-
-                for (const themeFile of themeFiles) {
-                    if (themeFile.endsWith('.json')) {
-                        const themePath = path.join(themesPath, themeFile)
-                        
-                        let theme
-                        try {
-                            theme = JSON5.parse(await readFile(themePath))
-                        } catch {
-                            // Ignore
-                        }
-
-                        if (theme?.name) {
-                            themes.push({
-                                name: theme.name,
-                                path: themePath,
-                            })
-                        }
+            if (file) {
+                const pkg = JSON5.parse(file)
+                const { themes } = pkg.contributes
+    
+                if (themes) {
+                    for (const theme of themes) {
+                        availableThemes.push({
+                            name: theme.label,
+                            path: path.resolve(extensionPath, theme.path),
+                        })
                     }
                 }
             }
         }
     }
 
-    return themes
+    return availableThemes
 }
 
 export const getThemeFromName = async (themeName) => {
-    // Check if the theme exists in the cwd first so that we can easily test any theme file.
-    const relativeTheme = fs.existsSync(themeName)
-    
-    if (relativeTheme) {
+    // The user can optionally supply a path to a theme file directly.
+    if (themeName.endsWith('.json')) {
         return themeName
     } else {
         const themes = await getAvailableThemes()

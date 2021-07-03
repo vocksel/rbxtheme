@@ -3,10 +3,11 @@ import { program } from 'commander'
 import chalk from 'chalk'
 import clipboardy from 'clipboardy'
 import fs from 'fs'
-import { readFile } from 'fs/promises'
+import { readFile, stat } from 'fs/promises'
 import JSON5 from 'json5'
 import path from 'path'
 import convert from '../src/index.js'
+import { getAvailableThemes, getThemeFromName } from '../src/theme.js'
 
 const __dirname = path.dirname(import.meta.url.substring(8))
 const pkg = JSON5.parse(await readFile(path.join(__dirname, '../package.json')))
@@ -25,35 +26,50 @@ program
     .action(async (theme, options, command) => {
         const themePath = await getThemeFromName(theme)
 
-        if (fs.existsSync(themePath)) {
-            const [command, missingColors] = convert(themePath)
-            const minified = command.replace(/\s+|[\t\r\n]/gm, ' ')
-            
-            if (missingColors.length > 0) {
-                const colorList = missingColors.toString()
-        
-                console.log(chalk.yellow(`WARN: Some colors could not be converted: ${colorList}`))
-                console.log(chalk.yellow(`Please submit an issue to ${pkg.bugs.url} with a link to the theme `
-                    + `you are converting.`))
-            }
-
-            if (options.clipboard) {
-                await clipboardy.write(minified)
-                console.log('Theme copied to clipboard. Paste it into the command bar in Studio to change your ' +
-                    'Script Editor theme.')
-            } else {
-                console.log('Copy/paste this command into the command bar in Studio to set your Script Editor theme')
-                
-                if (options.expanded) {
-                    console.log('\n' + command)
-                } else {
-                    console.log('\n' + minified)
-                }
-            }
-        } else {
+        const themeFileNotFound = () => {
             console.log(chalk.red(`Could not find a theme file named '${theme}'`))
             command.help()
         }
+
+        if (!themePath) {
+            themeFileNotFound()
+        }
+
+        stat(themePath)
+            .then(async () => {
+                const [command, missingColors] = await convert(themePath)
+                const minified = command.replace(/\s+|[\t\r\n]/gm, ' ')
+                
+                if (missingColors.length > 0) {
+                    const colorList = missingColors.toString()
+            
+                    console.log(chalk.yellow(`WARN: Some colors could not be converted: ${colorList}`))
+                    console.log(chalk.yellow(`Please submit an issue to ${pkg.bugs.url} with a link to the theme `
+                        + `you are converting.`))
+                }
+    
+                if (options.clipboard) {
+                    await clipboardy.write(minified)
+                    console.log('Theme copied to clipboard. Paste it into the command bar in Studio to change your ' +
+                        'Script Editor theme.')
+                } else {
+                    console.log('Copy/paste this command into the command bar in Studio to set your Script Editor theme')
+                    
+                    if (options.expanded) {
+                        console.log('\n' + command)
+                    } else {
+                        console.log('\n' + minified)
+                    }
+                }
+            })
+            .catch((err) => {
+                console.log(err.code)
+                if (err.code === 'ENOENT') {
+                    themeFileNotFound()
+                } else {
+                    throw err
+                }
+            })
     })
 
 program
