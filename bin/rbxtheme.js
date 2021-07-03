@@ -17,7 +17,22 @@ program
     .showHelpAfterError()
 
 program
-    .command('convert', { isDefault: true })
+    .command('list', { isDefault: true })
+    .description('Lists the names of the available themes. Use these names with the `convert` command to generate '
+        + 'Studio themes.')
+    .action(async () => {
+        const themes = await getAvailableThemes()
+
+        console.log('Available themes:')
+        for (const {name} of themes) {
+            console.log(`- ${name}`)
+        }
+
+        console.log('Run `rbxtheme convert <theme>` with one of the listed themes')
+    })
+
+program
+    .command('convert')
     .description('Converts one of the available VSCode themes into a command you can run from Studio to set your '
         + 'Script Editor colors')
     .argument('<theme>', `Name of the theme file to convert. Run 'rbxtheme list' for a list of themes you can use`)
@@ -70,19 +85,6 @@ program
                     throw err
                 }
             })
-    })
-
-program
-    .command('list')
-    .description('Lists the names of the available themes. Use these names with the `convert` command to generate '
-        + 'Studio themes.')
-    .action(async () => {
-        const themes = await getAvailableThemes()
-
-        console.log('Available themes:')
-        for (const {name} of themes) {
-            console.log(`- ${name}`)
-        }
     })
 
 program.parse(process.argv)
