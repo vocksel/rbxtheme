@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises'
 import JSON5  from 'json5'
-import { getBaseColors, getTokenColors } from 'theme'
+import { getBaseColors, getTokenColors } from './theme.js'
 
 const convert = async (themeFile) => {
     const theme = JSON5.parse(await readFile(themeFile, 'utf8'))

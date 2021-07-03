@@ -1,5 +1,9 @@
+import path from 'path'
+import os from 'os'
 import hexRgb from 'hex-rgb'
-import { ROBLOX_VSCODE_THEME_MAP, ROBLOX_TOKEN_SCOPE_MAP } from './constants'
+import JSON5 from 'json5'
+import { readdir, stat, readFile } from 'fs/promises'
+import { ROBLOX_VSCODE_THEME_MAP, ROBLOX_TOKEN_SCOPE_MAP } from './constants.js'
 
 const hexRgbAsArray = (hex) => {
     const color = hexRgb(hex)
