@@ -7,7 +7,7 @@ import { readFile, stat } from 'fs/promises'
 import JSON5 from 'json5'
 import path from 'path'
 import convert from '../src/index.js'
-import { getAvailableThemes, getThemeFromName } from '../src/theme.js'
+import { getAvailableThemes, getThemeFromName, logArray } from '../src/theme.js'
 
 const __dirname = path.dirname(import.meta.url.substring(8))
 const pkg = JSON5.parse(await readFile(path.join(__dirname, '../package.json')))
@@ -24,9 +24,7 @@ program
         const themes = await getAvailableThemes()
 
         console.log('Available themes:')
-        for (const {name} of themes) {
-            console.log(`- ${name}`)
-        }
+        logArray(themes.map(theme => theme.name))
 
         console.log('Run `rbxtheme convert <theme>` with one of the listed themes')
     })

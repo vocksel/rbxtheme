@@ -3,7 +3,8 @@ import os from 'os'
 import hexRgb from 'hex-rgb'
 import JSON5 from 'json5'
 import { readdir, stat, readFile } from 'fs/promises'
-import { ROBLOX_VSCODE_THEME_MAP, ROBLOX_TOKEN_SCOPE_MAP } from './constants.js'
+import { ROBLOX_VSCODE_THEME_MAP, ROBLOX_TOKEN_SCOPE_MAP } from './constants.js' 
+import Table from 'cli-table3'
 
 const hexRgbAsArray = (hex) => {
     const color = hexRgb(hex)
@@ -128,4 +129,33 @@ export const getTokenColors = (theme) => {
     }
 
     return [colors, missing]
+}
+
+// Splits an array into sub-arrays, where the length of the sub-arrays
+const arrayToTable = (array, columns=3) => {
+    // Split the array into an array of arrays, where each sub-array has the first `rows` number of elements from the first array.
+
+    let rows = 0
+    return array.reduce((acc, value, index) => {
+        const columnIndex = index % columns
+
+        if (columnIndex === 0) {
+            acc.push([ value ])
+            rows++
+        } else {
+            acc[rows - 1].push(value)
+        }
+
+        return acc
+    }, [])
+}
+
+export const logArray = (array) => {
+    const table = new Table()
+
+    table.push(
+        ...arrayToTable(array, 3)
+    )
+
+    console.log(table.toString())
 }

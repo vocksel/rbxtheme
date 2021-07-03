@@ -24,6 +24,7 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.1",
+    "cli-table3": "^0.6.0",
     "clipboardy": "^2.3.0",
     "commander": "^8.0.0",
     "hex-rgb": "^5.0.0",
