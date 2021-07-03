@@ -1,4 +1,4 @@
-# roblox-theme-converter
+# rbxtheme
 
 Converts a Visual Studio Code theme into one that is compatible with Roblox Studio's script editor.
 
@@ -7,9 +7,9 @@ Converts a Visual Studio Code theme into one that is compatible with Roblox Stud
 Install the package globally to get access to the `rbxtheme` command.
 
 ```sh
-$ npm install -g roblox-theme-converter
+$ npm install -g rbxtheme
 # Or
-$ yarn global add roblox-theme-converter
+$ yarn global add rbxtheme
 ```
 
 Then you can view the list of all the available themes.
