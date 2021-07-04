@@ -17,14 +17,14 @@ export const ROBLOX_VSCODE_THEME_MAP = {
 
 export const ROBLOX_TOKEN_SCOPE_MAP = {
     'Text Color': [ 'string.unquoted', 'variable', 'variable.object', 'variable.other', 'variable.parameter', 'support' ],
-    'Operator Color': [ 'keyword.operator' ],
+    'Operator Color': [ 'keyword.operator', 'keyword' ],
     'Number Color': [ 'constant.numeric' ],
     'String Color': [ 'string', 'string.quoted' ],
     'Comment Color': [ 'comment' ],
     'Bool Color': [ 'constant.language' ],
     '"nil" Color': [ 'constant.language' ],
     'Function Name Color': [ 'variable.function' ],
-    '"function" Color': [ 'variable.parameter.function.language.special', 'variable', 'keyword' ],
+    '"function" Color': [ 'variable.parameter.function.language.special', 'keyword', 'variable' ],
     '"local" Color': ['keyword'],
     '"self" Color': [ 'variable.instance', 'variable.language', 'support', 'keyword', 'variable' ],
     'Luau Keyword Color': [ 'variable' ],
