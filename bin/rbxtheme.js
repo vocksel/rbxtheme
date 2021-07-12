@@ -2,14 +2,13 @@
 import { program } from 'commander'
 import chalk from 'chalk'
 import clipboardy from 'clipboardy'
-import fs from 'fs'
 import { readFile, stat } from 'fs/promises'
 import JSON5 from 'json5'
 import path from 'path'
 import convert from '../src/index.js'
 import { getAvailableThemes, getThemeFromName, logArray } from '../src/theme.js'
 
-const __dirname = path.dirname(import.meta.url.substring(8))
+const __dirname = path.dirname(import.meta.url.substring(7))
 const pkg = JSON5.parse(await readFile(path.join(__dirname, '../package.json')))
 
 program
