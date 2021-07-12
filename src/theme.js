@@ -3,12 +3,12 @@ import os from 'os'
 import hexRgb from 'hex-rgb'
 import JSON5 from 'json5'
 import { readdir, stat, readFile } from 'fs/promises'
-import { ROBLOX_VSCODE_THEME_MAP, ROBLOX_TOKEN_SCOPE_MAP } from './constants.js' 
+import { ROBLOX_VSCODE_THEME_MAP, ROBLOX_TOKEN_SCOPE_MAP } from './constants.js'
 import Table from 'cli-table3'
 
 const hexRgbAsArray = (hex) => {
     const color = hexRgb(hex)
-    return [ color.red, color.green, color.blue, color.alpha ]
+    return [ color.red, color.green, color.blue ]
 }
 
 // Returns a dictionary that maps each scope to its associated color.
@@ -55,7 +55,7 @@ export const getAvailableThemes = async () => {
             if (file) {
                 const pkg = JSON5.parse(file)
                 const { themes } = pkg.contributes
-    
+
                 if (themes) {
                     for (const theme of themes) {
                         availableThemes.push({
