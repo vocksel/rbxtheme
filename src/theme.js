@@ -77,7 +77,7 @@ export const getThemeFromName = async (themeName) => {
         return themeName
     } else {
         const themes = await getAvailableThemes()
-        const theme = themes.find(theme => themeName === theme.name)
+        const theme = themes.find(theme => themeName.toLowerCase() === theme.name.toLowerCase())
 
         if (theme) {
             return theme.path
