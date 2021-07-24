@@ -3,13 +3,8 @@ import os from 'os'
 import hexRgb from 'hex-rgb'
 import JSON5 from 'json5'
 import { readdir, stat, readFile } from 'fs/promises'
-import { ROBLOX_VSCODE_THEME_MAP, ROBLOX_TOKEN_SCOPE_MAP } from './constants.js'
+import { ROBLOX_VSCODE_THEME_MAP } from './constants.js'
 import Table from 'cli-table3'
-
-const hexRgbAsArray = (hex) => {
-    const color = hexRgb(hex)
-    return [ color.red, color.green, color.blue ]
-}
 
 // Returns a dictionary that maps each scope to its associated color.
 const getScopeColors = (theme) => {
@@ -85,50 +80,49 @@ export const getThemeFromName = async (themeName) => {
     }
 }
 
-export const getBaseColors = (theme) => {
-    let colors = {}
-    const missing = []
-    for (const [studioName, colorName] of Object.entries(ROBLOX_VSCODE_THEME_MAP)) {
-        const color = theme.colors[colorName]
-        if (color) {
-            colors[studioName] = hexRgbAsArray(color)
-        } else {
-            missing.push(studioName)
-        }
-    }
-    return [colors, missing]
-}
-
-export const getTokenColors = (theme) => {
-    const scopeColors = getScopeColors(theme)
+const getThemeColors = (theme) => {
     const colors = {}
     const missing = []
 
-    for (const [studioName, scopes] of Object.entries(ROBLOX_TOKEN_SCOPE_MAP)) {
+    for (const [studioName, vscodeColors] of Object.entries(ROBLOX_VSCODE_THEME_MAP)) {
         let color
 
-        for (const scope of scopes) {
-            const maybeColor = scopeColors[scope]
-            if (maybeColor) {
-                color = maybeColor
+        for (const vscodeColor of vscodeColors) {
+            console.log('checking', vscodeColor)
+
+            color = theme.colors[vscodeColor]
+
+            if (!color) {
+                // The color doesn't exist in the root list of theme colors. Let's
+                // look through the tokenColors array.
+                const scopeColors = getScopeColors(theme)
+                color = scopeColors[vscodeColor]
+            }
+    
+            // Ok, not there either. Does the theme have global colors?
+            if (!color) {
+                const global = theme.tokenColors.find(token => token.scope === undefined)
+    
+                if (global) {
+                    color = global.settings.foreground
+                }
+            }
+
+            if (color) {
+                console.log('using', vscodeColor, 'for', studioName)
                 break
             }
         }
 
         if (color) {
-            colors[studioName] = hexRgbAsArray(color)
+            const color = hexRgb(hex)
+            colors[studioName] = [ color.red, color.green, color.blue ]
         } else {
-            const global = theme.tokenColors.find(token => token.scope === undefined)
-
-            if (global) {
-                color = global.settings.foreground
-            } else {
-                missing.push(studioName)
-            }
+            missing.push(studioName)
         }
     }
 
-    return [colors, missing]
+    return [ colors, missing ]
 }
 
 // Split the array into an array of arrays, where each sub-array has the first
@@ -162,23 +156,11 @@ export const logArray = (array) => {
 
 export const convert = async (themeFile) => {
     const theme = JSON5.parse(await readFile(themeFile, 'utf8'))
-
-    const [baseColors, missingBaseColors] = getBaseColors(theme)
-    const [tokenColors, missingTokenColors] = getTokenColors(theme)
-
-    const studioTheme = {
-        ...baseColors,
-        ...tokenColors,
-    }
-
-    const missingColors = [
-        ...missingBaseColors,
-        ...missingTokenColors
-    ]
+    const [colors, missingColors] = getThemeColors(theme)
 
     const command = `local ChangeHistoryService = game:GetService("ChangeHistoryService")
 
-local json = [[${JSON.stringify(studioTheme)}]]
+local json = [[${JSON.stringify(colors)}]]
 local theme = game.HttpService:JSONDecode(json)
 
 ChangeHistoryService:SetWaypoint("Changing theme")

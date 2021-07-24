@@ -1,21 +1,15 @@
-// Maps Roblox Studio's theme properties to the ones at the top level of a VS
-// Code theme. If you want to use the tokenColors array, then assign Studio
-// theme properties to the tokens in ROBLOX_TOKEN_MAP.
 export const ROBLOX_VSCODE_THEME_MAP = {
-    'Background Color': 'editor.background',
-    'Selection Color': 'selection.background',
-    'Selection Background Color': 'selection.background',
-    'Error Color': 'errorForeground',
-    'Warning Color': 'editorWarning.foreground',
-    'Find Selection Background Color': 'editor.findMatchBackground',
-    'Matching Word Background Color': 'editor.selectionBackground',
-    'Whitespace Color': 'editorLineNumber.activeForeground',
-    'Current Line Highlight Color': 'editor.background',
-    'Ruler Color': 'editorRuler.foreground',
-    'Bracket Color': 'editorLineNumber.foreground',
-}
-
-export const ROBLOX_TOKEN_SCOPE_MAP = {
+    'Background Color': [ 'editor.background' ],
+    'Selection Color': [ 'errorForeground' ],
+    'Selection Background Color': [ 'selection.background' ],
+    'Error Color': [ 'errorForeground' ],
+    'Warning Color': [ 'editorWarning.foreground' ],
+    'Find Selection Background Color': [ 'editor.findMatchBackground' ],
+    'Matching Word Background Color': [ 'editor.selectionBackground' ],
+    'Whitespace Color': [ 'editorLineNumber.activeForeground' ],
+    'Current Line Highlight Color': [ 'editor.background' ],
+    'Ruler Color': [ 'editorRuler.foreground' ],
+    'Bracket Color': [ 'editorLineNumber.foreground' ],
     'Text Color': [ 'string.unquoted', 'variable', 'variable.object', 'variable.other', 'variable.parameter', 'support' ],
     'Operator Color': [ 'keyword.operator', 'keyword' ],
     'Number Color': [ 'constant.numeric' ],
