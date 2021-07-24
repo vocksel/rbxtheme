@@ -88,8 +88,6 @@ const getThemeColors = (theme) => {
         let color
 
         for (const vscodeColor of vscodeColors) {
-            console.log('checking', vscodeColor)
-
             color = theme.colors[vscodeColor]
 
             if (!color) {
@@ -109,7 +107,6 @@ const getThemeColors = (theme) => {
             }
 
             if (color) {
-                console.log('using', vscodeColor, 'for', studioName)
                 break
             }
         }
