@@ -1,6 +1,6 @@
 export const ROBLOX_VSCODE_THEME_MAP = {
     'Background Color': [ 'editor.background' ],
-    'Selection Color': [ 'errorForeground' ],
+    'Selection Color': [ 'foreground' ],
     'Selection Background Color': [ 'selection.background' ],
     'Error Color': [ 'errorForeground' ],
     'Warning Color': [ 'editorWarning.foreground' ],
