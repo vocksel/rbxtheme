@@ -8,7 +8,6 @@ import JSON5 from 'json5'
 import path from 'path'
 import { convert, getAvailableThemes, getThemeFromName, logArray } from './theme.js'
 
-console.log(path.resolve(import.meta.url.substring(8)))
 const __dirname = path.dirname(import.meta.url.substring(8))
 const pkg = JSON5.parse(await readFile(path.join(__dirname, '../package.json')))
 
