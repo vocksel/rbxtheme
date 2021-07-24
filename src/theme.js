@@ -131,10 +131,10 @@ export const getTokenColors = (theme) => {
     return [colors, missing]
 }
 
-// Splits an array into sub-arrays, where the length of the sub-arrays
+// Split the array into an array of arrays, where each sub-array has the first
+// `columns` number of elements from the first array. This is used to build the
+// grid of theme names.
 const arrayToTable = (array, columns=3) => {
-    // Split the array into an array of arrays, where each sub-array has the first `rows` number of elements from the first array.
-
     let rows = 0
     return array.reduce((acc, value, index) => {
         const columnIndex = index % columns
@@ -158,4 +158,48 @@ export const logArray = (array) => {
     )
 
     console.log(table.toString())
+}
+
+export const convert = async (themeFile) => {
+    const theme = JSON5.parse(await readFile(themeFile, 'utf8'))
+
+    const [baseColors, missingBaseColors] = getBaseColors(theme)
+    const [tokenColors, missingTokenColors] = getTokenColors(theme)
+
+    const studioTheme = {
+        ...baseColors,
+        ...tokenColors,
+    }
+
+    const missingColors = [
+        ...missingBaseColors,
+        ...missingTokenColors
+    ]
+
+    const command = `local ChangeHistoryService = game:GetService("ChangeHistoryService")
+
+local json = [[${JSON.stringify(studioTheme)}]]
+local theme = game.HttpService:JSONDecode(json)
+
+ChangeHistoryService:SetWaypoint("Changing theme")
+
+local studio = settings().Studio
+
+for name, color in pairs(theme) do
+    color = Color3.fromRGB(color[1], color[2], color[3])
+
+    local success = pcall(function()
+        studio[name] = color
+    end)
+
+    if not success then
+        warn(("%s is not a valid theme color"):format(name))
+    end
+end
+
+ChangeHistoryService:SetWaypoint("Theme changed")
+
+print("Successfully changed your Script Editor theme!")`
+
+    return [command, missingColors]
 }

@@ -5,14 +5,14 @@
   "description": "Converts a Visual Studio Code theme into a compatible Roblox Studio theme",
   "main": "src/index.js",
   "scripts": {
-    "start": "node ./bin/rbxtheme.js",
+    "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bugs": {
     "url": "https://github.com/vocksel/rbxtheme/issues"
   },
   "bin": {
-    "rbxtheme": "bin/rbxtheme.js"
+    "rbxtheme": "src/index.js"
   },
   "keywords": [
     "roblox",
