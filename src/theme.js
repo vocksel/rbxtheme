@@ -80,6 +80,27 @@ export const getThemeFromName = async (themeName) => {
     }
 }
 
+const toRGB = (theme, hex) => {
+    const { red, green, blue, alpha } = hexRgb(hex)
+
+    // VSCode allows the use of alpha with RGB values. Roblox does not support
+    // this, so to keep themes looking consistent the color is blended with the
+    // background.
+    if (alpha < 1) {
+        const background = hexRgb(theme.colors['editor.background'] || '#fff')
+
+        if (background) {
+            return [
+                (1 - alpha) * background.red + alpha * red,
+                (1 - alpha) * background.green + alpha * green,
+                (1 - alpha) * background.blue + alpha * blue,
+            ]
+        }
+    }
+
+    return [red, green, blue ]
+}
+
 const getThemeColors = (theme) => {
     const colors = {}
     const missing = []
@@ -112,8 +133,7 @@ const getThemeColors = (theme) => {
         }
 
         if (color) {
-            const color = hexRgb(hex)
-            colors[studioName] = [ color.red, color.green, color.blue ]
+            colors[studioName] = toRGB(theme, color)
         } else {
             missing.push(studioName)
         }
