@@ -1,3 +1,15 @@
+// This object maps Roblox Studio script editor colors to an array of VSCode's
+// base colors, as well as token colors. 
+//
+// See the Studio object for valid script editor colors.
+// https://developer.roblox.com/en-us/api-reference/class/Studio
+//
+// When examining a theme's json file, there is a `colors` object, and a
+// `tokenColors` array. Any key in the `colors` object can be used, and any of
+// the scopes for the token's can be used.
+//
+// Precedence is left-to-right, so for example with Text Color: if a match is
+// found for `string.unquoted`, then `variable` will not be used.
 export const ROBLOX_VSCODE_THEME_MAP = {
     'Background Color': [ 'editor.background' ],
     'Selection Color': [ 'foreground' ],
