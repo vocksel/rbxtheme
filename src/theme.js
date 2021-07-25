@@ -175,12 +175,8 @@ export const convert = async (themeFile) => {
     const theme = JSON5.parse(await readFile(themeFile, 'utf8'))
     const [colors, missingColors] = getThemeColors(theme)
 
-    const command = `local ChangeHistoryService = game:GetService("ChangeHistoryService")
-
-local json = [[${JSON.stringify(colors)}]]
+    const command = `local json = [[${JSON.stringify(colors)}]]
 local theme = game.HttpService:JSONDecode(json)
-
-ChangeHistoryService:SetWaypoint("Changing theme")
 
 local studio = settings().Studio
 
@@ -195,8 +191,6 @@ for name, color in pairs(theme) do
         warn(("%s is not a valid theme color"):format(name))
     end
 end
-
-ChangeHistoryService:SetWaypoint("Theme changed")
 
 print("Successfully changed your Script Editor theme!")`
 
