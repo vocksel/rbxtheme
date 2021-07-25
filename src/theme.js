@@ -67,16 +67,11 @@ export const getAvailableThemes = async () => {
 }
 
 export const getThemeFromName = async (themeName) => {
-    // The user can optionally supply a path to a theme file directly.
-    if (themeName.endsWith('.json')) {
-        return themeName
-    } else {
-        const themes = await getAvailableThemes()
-        const theme = themes.find(theme => themeName.toLowerCase() === theme.name.toLowerCase())
+    const themes = await getAvailableThemes()
+    const theme = themes.find(theme => themeName.toLowerCase() === theme.name.toLowerCase())
 
-        if (theme) {
-            return theme.path
-        }
+    if (theme) {
+        return theme.path
     }
 }
 

@@ -32,11 +32,16 @@ program
     .command('convert')
     .description('Converts one of the available VSCode themes into a command you can run from Studio to set your '
         + 'Script Editor colors')
-    .argument('<theme>', `Name of the theme file to convert. Run 'rbxtheme list' for a list of themes you can use`)
+    .argument('<theme>', `Name of the theme file to convert. Run 'rbxtheme list' for a list of themes you can use. This can also be a direct path to a theme's json file`)
     .option('-c, --copy', 'Copy the generated command to the clipboard automatically')
     .option('-e, --expanded', 'Log the Studio command in its non-minified form')
     .action(async (theme, options, command) => {
-        const themePath = await getThemeFromName(theme)
+        let themePath
+        if (theme?.endsWith('.json')) {
+            themePath = theme
+        } else {
+            themePath = await getThemeFromName(theme)
+        }
 
         const themeFileNotFound = () => {
             console.log(chalk.red(`Could not find a theme file named '${theme}'`))
@@ -75,7 +80,6 @@ program
                 }
             })
             .catch((err) => {
-                console.log(err.code)
                 if (err.code === 'ENOENT') {
                     themeFileNotFound()
                 } else {
