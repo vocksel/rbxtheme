@@ -91,9 +91,9 @@ const toRGB = (theme, hex) => {
 
         if (background) {
             return [
-                (1 - alpha) * background.red + alpha * red,
-                (1 - alpha) * background.green + alpha * green,
-                (1 - alpha) * background.blue + alpha * blue,
+                Math.round((1 - alpha) * background.red + alpha * red),
+                Math.round((1 - alpha) * background.green + alpha * green),
+                Math.round((1 - alpha) * background.blue + alpha * blue),
             ]
         }
     }
