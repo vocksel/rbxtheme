@@ -2,7 +2,7 @@ import path from 'path'
 import os from 'os'
 import hexRgb from 'hex-rgb'
 import JSON5 from 'json5'
-import { readdir, stat, readFile } from 'fs/promises'
+import fs from 'fs'
 import { ROBLOX_VSCODE_THEME_MAP } from './constants.js'
 import Table from 'cli-table3'
 
@@ -29,20 +29,20 @@ const getScopeColors = (theme) => {
     return colors
 }
 
-export const getAvailableThemes = async () => {
+export const getAvailableThemes = () => {
     const extensionsPath = path.join(os.homedir(), '.vscode/extensions/')
-    const extensions = await readdir(extensionsPath)
+    const extensions = fs.readdirSync(extensionsPath)
 
     const availableThemes = []
 
     for (const extension of extensions) {
         const extensionPath = path.join(extensionsPath, extension)
-        const stats = await stat(extensionPath)
+        const stats = fs.statSync(extensionPath)
 
         if (stats.isDirectory()) {
             let file
             try {
-                file = await readFile(path.join(extensionPath, 'package.json'))
+                file = fs.readFileSync(path.join(extensionPath, 'package.json'))
             } catch (e) {
                 // ignore
             }
@@ -66,8 +66,8 @@ export const getAvailableThemes = async () => {
     return availableThemes
 }
 
-export const getThemeFromName = async (themeName) => {
-    const themes = await getAvailableThemes()
+export const getThemeFromName = (themeName) => {
+    const themes = getAvailableThemes()
     const theme = themes.find(theme => themeName.toLowerCase() === theme.name.toLowerCase())
 
     if (theme) {
@@ -166,8 +166,8 @@ export const logArray = (array) => {
     console.log(table.toString())
 }
 
-export const convert = async (themeFile) => {
-    const theme = JSON5.parse(await readFile(themeFile, 'utf8'))
+export const convert = (themeFile) => {
+    const theme = JSON5.parse(fs.readFileSync(themeFile, 'utf8'))
     const [colors, missingColors] = getThemeColors(theme)
 
     const command = `local json = [[${JSON.stringify(colors)}]]
