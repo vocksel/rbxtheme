@@ -12,8 +12,8 @@
 // found for `string.unquoted`, then `variable` will not be used.
 export const ROBLOX_VSCODE_THEME_MAP = {
     'Background Color': ['editor.background'],
-    'Selection Color': ['foreground'],
-    'Selection Background Color': ['selection.background'],
+    'Selection Color': ['foreground', 'editor.foreground'],
+    'Selection Background Color': ['editor.selectionBackground', 'selection.background'],
     'Error Color': ['errorForeground'],
     'Warning Color': ['editorWarning.foreground'],
     'Find Selection Background Color': ['editor.findMatchBackground'],
@@ -29,7 +29,7 @@ export const ROBLOX_VSCODE_THEME_MAP = {
     'Comment Color': ['comment'],
     'Bool Color': ['constant.language', 'constant'],
     '"nil" Color': ['constant.language', 'constant'],
-    'Function Name Color': ['entity.name.function', 'variable.function'],
+    'Function Name Color': ['entity.name.function', 'variable.function', 'meta.function'],
     '"function" Color': ['keyword', 'keyword.control', 'variable', 'variable.language', 'meta.function'],
     '"local" Color': ['keyword'],
     '"self" Color': ['variable.instance', 'variable.language', 'support', 'keyword', 'variable'],
