@@ -29,7 +29,7 @@ export const ROBLOX_VSCODE_THEME_MAP = {
     'Comment Color': ['comment'],
     'Bool Color': ['constant.language', 'constant'],
     '"nil" Color': ['constant.language', 'constant'],
-    'Function Name Color': ['entity.name.function', 'variable.function'],
+    'Function Name Color': ['entity.name.function', 'variable.function', 'meta.function'],
     '"function" Color': ['keyword', 'keyword.control', 'variable', 'variable.language', 'meta.function'],
     '"local" Color': ['keyword'],
     '"self" Color': ['variable.instance', 'variable.language', 'support', 'keyword', 'variable'],
