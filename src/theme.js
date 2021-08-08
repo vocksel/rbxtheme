@@ -93,7 +93,7 @@ const toRGB = (theme, hex) => {
         }
     }
 
-    return [red, green, blue ]
+    return [red, green, blue]
 }
 
 const getThemeColors = (theme) => {
@@ -112,11 +112,11 @@ const getThemeColors = (theme) => {
                 const scopeColors = getScopeColors(theme)
                 color = scopeColors[vscodeColor]
             }
-    
+
             // Ok, not there either. Does the theme have global colors?
             if (!color) {
                 const global = theme.tokenColors.find(token => token.scope === undefined)
-    
+
                 if (global) {
                     color = global.settings.foreground
                 }
@@ -134,19 +134,19 @@ const getThemeColors = (theme) => {
         }
     }
 
-    return [ colors, missing ]
+    return [colors, missing]
 }
 
 // Split the array into an array of arrays, where each sub-array has the first
 // `columns` number of elements from the first array. This is used to build the
 // grid of theme names.
-const arrayToTable = (array, columns=3) => {
+const arrayToTable = (array, columns = 3) => {
     let rows = 0
     return array.reduce((acc, value, index) => {
         const columnIndex = index % columns
 
         if (columnIndex === 0) {
-            acc.push([ value ])
+            acc.push([value])
             rows++
         } else {
             acc[rows - 1].push(value)

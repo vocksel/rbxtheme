@@ -47,15 +47,15 @@ program
         if (fs.existsSync(themePath)) {
             const [command, missingColors] = convert(themePath)
             const minified = command.replace(/\s+|[\t\r\n]/gm, ' ')
-    
+
             if (missingColors.length > 0) {
                 const colorList = missingColors.toString()
-    
+
                 console.log(chalk.yellow(`WARN: Some colors could not be converted: ${colorList}`))
                 console.log(chalk.yellow(`Please submit an issue to ${pkg.bugs.url} with a link to the theme `
                     + `you are converting.`))
             }
-    
+
             if (options.copy) {
                 clipboardy.write(minified).then(() => {
                     console.log('Theme copied to clipboard. Paste it into the command bar in Studio to change your ' +
@@ -63,7 +63,7 @@ program
                 })
             } else {
                 console.log('Copy/paste this command into the command bar in Studio to set your Script Editor theme')
-    
+
                 if (options.expanded) {
                     console.log('\n' + command)
                 } else {
