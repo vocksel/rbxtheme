@@ -54,7 +54,7 @@ export const getAvailableThemes = () => {
 
             if (file) {
                 const pkg = JSON5.parse(file)
-                const { themes } = pkg.contributes
+                const { themes } = pkg.contributes || {}
 
                 if (themes) {
                     for (const theme of themes) {
