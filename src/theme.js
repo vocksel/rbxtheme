@@ -3,7 +3,7 @@ import os from 'os'
 import hexRgb from 'hex-rgb'
 import JSON5 from 'json5'
 import { readdir, stat, readFile } from 'fs/promises'
-import { ROBLOX_VSCODE_THEME_MAP } from './constants.js'
+import { ROBLOX_VSCODE_THEME_MAP, MAC_DIRECTORIES, WINDOWS_DIRECTORIES } from './constants.js'
 import Table from 'cli-table3'
 
 // Returns a dictionary that maps each scope to its associated color.
@@ -29,14 +29,39 @@ const getScopeColors = (theme) => {
     return colors
 }
 
-export const getAvailableThemes = async () => {
-    const extensionsPath = path.join(os.homedir(), '.vscode/extensions/')
-    const extensions = await readdir(extensionsPath)
+const getDefaultExtensionsDir = async () => {
+    let potentialInstallDirs = []
+    switch (process.platform) {
+        case 'win32':
+            potentialInstallDirs = WINDOWS_DIRECTORIES
+            break
+        case 'darwin':
+            potentialInstallDirs = MAC_DIRECTORIES
+            break
+    }
 
+    for (const dir of potentialInstallDirs) {
+        const stats = await stat(dir)
+            .catch(err => {
+                if (err.code !== 'ENOENT') {
+                    console.error(err.message)
+                }
+            })
+
+        if (stats) {
+            return path.join(dir, 'resources/app/extensions')
+        }
+    }
+}
+
+const getThemesInDir = async (extensionsPath) => {
     const availableThemes = []
+
+    const extensions = await readdir(extensionsPath)
 
     for (const extension of extensions) {
         const extensionPath = path.join(extensionsPath, extension)
+
         const stats = await stat(extensionPath)
 
         if (stats.isDirectory()) {
@@ -54,7 +79,7 @@ export const getAvailableThemes = async () => {
                 if (themes) {
                     for (const theme of themes) {
                         availableThemes.push({
-                            name: theme.label,
+                            name: theme.id || theme.label,
                             path: path.resolve(extensionPath, theme.path),
                         })
                     }
@@ -64,6 +89,19 @@ export const getAvailableThemes = async () => {
     }
 
     return availableThemes
+}
+
+export const getAvailableThemes = async () => {
+    const defaultExtensionsPath = await getDefaultExtensionsDir()
+    const defaultThemes = await getThemesInDir(defaultExtensionsPath)
+
+    const extensionsPath = path.join(os.homedir(), '.vscode/extensions/')
+    const themes = await getThemesInDir(extensionsPath)
+
+    return [
+        ...defaultThemes,
+        ...themes,
+    ]
 }
 
 export const getThemeFromName = async (themeName) => {
@@ -93,7 +131,7 @@ const toRGB = (theme, hex) => {
         }
     }
 
-    return [red, green, blue ]
+    return [red, green, blue]
 }
 
 const getThemeColors = (theme) => {
@@ -112,11 +150,11 @@ const getThemeColors = (theme) => {
                 const scopeColors = getScopeColors(theme)
                 color = scopeColors[vscodeColor]
             }
-    
+
             // Ok, not there either. Does the theme have global colors?
             if (!color) {
                 const global = theme.tokenColors.find(token => token.scope === undefined)
-    
+
                 if (global) {
                     color = global.settings.foreground
                 }
@@ -134,19 +172,19 @@ const getThemeColors = (theme) => {
         }
     }
 
-    return [ colors, missing ]
+    return [colors, missing]
 }
 
 // Split the array into an array of arrays, where each sub-array has the first
 // `columns` number of elements from the first array. This is used to build the
 // grid of theme names.
-const arrayToTable = (array, columns=3) => {
+const arrayToTable = (array, columns = 3) => {
     let rows = 0
     return array.reduce((acc, value, index) => {
         const columnIndex = index % columns
 
         if (columnIndex === 0) {
-            acc.push([ value ])
+            acc.push([value])
             rows++
         } else {
             acc[rows - 1].push(value)
