@@ -43,12 +43,13 @@ export const ROBLOX_VSCODE_THEME_MAP = {
     'Property Color': ['variable'],
 }
 
-export const WINDOWS_DIRECTORIES = [
-    path.join(process.env.LOCALAPPDATA, '/Programs/Microsoft VS Code/'),
-    'C:/Programs Files/Microsoft VS Code/',
-    'C:/Program Files (x86)/Microsoft VS Code/'
+export const WINDOWS_DEFAULT_EXTENSIONS = [
+    process.platform === 'win32' && path.join(process.env.LOCALAPPDATA,
+        '/Programs/Microsoft VS Code/resources/app/extensions'),
+    'C:/Programs Files/Microsoft VS Code/resources/app/extensions',
+    'C:/Program Files (x86)/Microsoft VS Code/resources/app/extensions'
 ]
 
-export const MAC_DIRECTORIES = [
-    '/Applications/Microsoft VS Code'
+export const MACOS_DEFAULT_EXTENSIONs = [
+    '/Applications/Visual Studio Code.app/Contents/Resources/app/extensions'
 ]

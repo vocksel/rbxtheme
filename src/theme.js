@@ -3,7 +3,7 @@ import os from 'os'
 import hexRgb from 'hex-rgb'
 import JSON5 from 'json5'
 import { readdir, stat, readFile } from 'fs/promises'
-import { ROBLOX_VSCODE_THEME_MAP, MAC_DIRECTORIES, WINDOWS_DIRECTORIES } from './constants.js'
+import { ROBLOX_VSCODE_THEME_MAP, MACOS_DEFAULT_EXTENSIONs, WINDOWS_DEFAULT_EXTENSIONS } from './constants.js'
 import Table from 'cli-table3'
 
 // Returns a dictionary that maps each scope to its associated color.
@@ -30,17 +30,17 @@ const getScopeColors = (theme) => {
 }
 
 const getDefaultExtensionsDir = async () => {
-    let potentialInstallDirs = []
+    let potentialExtensionDirs = []
     switch (process.platform) {
         case 'win32':
-            potentialInstallDirs = WINDOWS_DIRECTORIES
+            potentialExtensionDirs = WINDOWS_DEFAULT_EXTENSIONS
             break
         case 'darwin':
-            potentialInstallDirs = MAC_DIRECTORIES
+            potentialExtensionDirs = MACOS_DEFAULT_EXTENSIONs
             break
     }
 
-    for (const dir of potentialInstallDirs) {
+    for (const dir of potentialExtensionDirs) {
         const stats = await stat(dir)
             .catch(err => {
                 if (err.code !== 'ENOENT') {
@@ -48,8 +48,10 @@ const getDefaultExtensionsDir = async () => {
                 }
             })
 
+        console.log(dir)
+
         if (stats) {
-            return path.join(dir, 'resources/app/extensions')
+            return dir
         }
     }
 }
@@ -92,16 +94,27 @@ const getThemesInDir = async (extensionsPath) => {
 }
 
 export const getAvailableThemes = async () => {
+    let availableThemes = []
+
     const defaultExtensionsPath = await getDefaultExtensionsDir()
-    const defaultThemes = await getThemesInDir(defaultExtensionsPath)
+    if (defaultExtensionsPath) {
+        const defaultThemes = await getThemesInDir(defaultExtensionsPath)
+
+        availableThemes = [
+            ...availableThemes,
+            ...defaultThemes
+        ]
+    }
 
     const extensionsPath = path.join(os.homedir(), '.vscode/extensions/')
     const themes = await getThemesInDir(extensionsPath)
 
-    return [
-        ...defaultThemes,
+    availableThemes = [
+        ...availableThemes,
         ...themes,
     ]
+
+    return availableThemes
 }
 
 export const getThemeFromName = async (themeName) => {
