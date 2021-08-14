@@ -3,13 +3,13 @@
 import { program } from 'commander'
 import chalk from 'chalk'
 import clipboardy from 'clipboardy'
-import fs from 'fs'
+import { stat, readFile } from 'fs/promises'
 import JSON5 from 'json5'
 import path from 'path'
 import { convert, getAvailableThemes, getThemeFromName, logArray } from './theme.js'
 
 const __dirname = path.dirname(import.meta.url.substring(7))
-const pkg = JSON5.parse(fs.readFileSync(path.join(__dirname, '../package.json')))
+const pkg = JSON5.parse(await readFile(path.join(__dirname, '../package.json')))
 
 program
     .version(pkg.version)
@@ -19,15 +19,14 @@ program
     .command('list', { isDefault: true })
     .description('Lists the names of the available themes. Use these names with the `convert` command to generate '
         + 'Studio themes.')
-    .action(() => {
-        const themes = getAvailableThemes()
+    .action(async () => {
+        const themes = await getAvailableThemes()
 
         console.log('Available themes:')
         logArray(themes.map(theme => theme.name))
 
         console.log('Run `rbxtheme convert <theme>` with one of the listed themes')
     })
-
 
 program
     .command('convert')
@@ -36,16 +35,23 @@ program
     .argument('<theme>', `Name of the theme file to convert. Run 'rbxtheme list' for a list of themes you can use. This can also be a direct path to a theme's json file`)
     .option('-c, --copy', 'Copy the generated command to the clipboard automatically')
     .option('-e, --expanded', 'Log the Studio command in its non-minified form')
-    .action((theme, options, command) => {
+    .action(async (theme, options, command) => {
         let themePath
         if (theme?.endsWith('.json')) {
             themePath = theme
         } else {
-            themePath = getThemeFromName(theme)
+            themePath = await getThemeFromName(theme)
         }
 
-        if (fs.existsSync(themePath)) {
-            const [command, missingColors] = convert(themePath)
+        const stats = await stat(themePath)
+            .catch(err => {
+                if (err.code !== 'ENOENT') {
+                    console.error(err)
+                }
+            })
+
+        if (stats.isFile()) {
+            const [command, missingColors] = await convert(themePath)
             const minified = command.replace(/\s+|[\t\r\n]/gm, ' ')
 
             if (missingColors.length > 0) {

@@ -2,8 +2,8 @@ import path from 'path'
 import os from 'os'
 import hexRgb from 'hex-rgb'
 import JSON5 from 'json5'
-import fs from 'fs'
-import { ROBLOX_VSCODE_THEME_MAP } from './constants.js'
+import { readdir, stat, readFile } from 'fs/promises'
+import { ROBLOX_VSCODE_THEME_MAP, MACOS_DEFAULT_EXTENSIONs, WINDOWS_DEFAULT_EXTENSIONS } from './constants.js'
 import Table from 'cli-table3'
 
 // Returns a dictionary that maps each scope to its associated color.
@@ -21,7 +21,7 @@ const getScopeColors = (theme) => {
             let scopes = []
             if (Array.isArray(token.scope)) {
                 scopes = token.scope
-            } else {
+            } else if (token.scope) {
                 scopes = token.scope.split(',')
             }
 
@@ -34,20 +34,45 @@ const getScopeColors = (theme) => {
     return colors
 }
 
-export const getAvailableThemes = () => {
-    const extensionsPath = path.join(os.homedir(), '.vscode/extensions/')
-    const extensions = fs.readdirSync(extensionsPath)
+const getDefaultExtensionsDir = async () => {
+    let potentialExtensionDirs = []
+    switch (process.platform) {
+        case 'win32':
+            potentialExtensionDirs = WINDOWS_DEFAULT_EXTENSIONS
+            break
+        case 'darwin':
+            potentialExtensionDirs = MACOS_DEFAULT_EXTENSIONs
+            break
+    }
 
+    for (const dir of potentialExtensionDirs) {
+        const stats = await stat(dir)
+            .catch(err => {
+                if (err.code !== 'ENOENT') {
+                    console.error(err.message)
+                }
+            })
+
+        if (stats) {
+            return dir
+        }
+    }
+}
+
+const getThemesInDir = async (extensionsPath) => {
     const availableThemes = []
+
+    const extensions = await readdir(extensionsPath)
 
     for (const extension of extensions) {
         const extensionPath = path.join(extensionsPath, extension)
-        const stats = fs.statSync(extensionPath)
+
+        const stats = await stat(extensionPath)
 
         if (stats.isDirectory()) {
             let file
             try {
-                file = fs.readFileSync(path.join(extensionPath, 'package.json'))
+                file = await readFile(path.join(extensionPath, 'package.json'))
             } catch (e) {
                 // ignore
             }
@@ -59,7 +84,7 @@ export const getAvailableThemes = () => {
                 if (themes) {
                     for (const theme of themes) {
                         availableThemes.push({
-                            name: theme.label,
+                            name: theme.id || theme.label,
                             path: path.resolve(extensionPath, theme.path),
                         })
                     }
@@ -71,8 +96,32 @@ export const getAvailableThemes = () => {
     return availableThemes
 }
 
-export const getThemeFromName = (themeName) => {
-    const themes = getAvailableThemes()
+export const getAvailableThemes = async () => {
+    let availableThemes = []
+
+    const defaultExtensionsPath = await getDefaultExtensionsDir()
+    if (defaultExtensionsPath) {
+        const defaultThemes = await getThemesInDir(defaultExtensionsPath)
+
+        availableThemes = [
+            ...availableThemes,
+            ...defaultThemes
+        ]
+    }
+
+    const extensionsPath = path.join(os.homedir(), '.vscode/extensions/')
+    const themes = await getThemesInDir(extensionsPath)
+
+    availableThemes = [
+        ...availableThemes,
+        ...themes,
+    ]
+
+    return availableThemes
+}
+
+export const getThemeFromName = async (themeName) => {
+    const themes = await getAvailableThemes()
     const theme = themes.find(theme => themeName.toLowerCase() === theme.name.toLowerCase())
 
     if (theme) {
@@ -109,7 +158,12 @@ const getThemeColors = (theme) => {
         let color
 
         for (const vscodeColor of vscodeColors) {
-            color = theme.colors[vscodeColor]
+            // TODO: Some default themes like Dark+ have an "include" field,
+            // which points to another theme files. Add support for that.
+
+            if (theme.colors) {
+                color = theme.colors[vscodeColor]
+            }
 
             if (!color) {
                 // The color doesn't exist in the root list of theme colors. Let's
@@ -171,8 +225,8 @@ export const logArray = (array) => {
     console.log(table.toString())
 }
 
-export const convert = (themeFile) => {
-    const theme = JSON5.parse(fs.readFileSync(themeFile, 'utf8'))
+export const convert = async (themeFile) => {
+    const theme = JSON5.parse(await readFile(themeFile, 'utf8'))
     const [colors, missingColors] = getThemeColors(theme)
 
     const command = `local json = [[${JSON.stringify(colors)}]]
