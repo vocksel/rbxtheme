@@ -43,8 +43,6 @@ program
             themePath = await getThemeFromName(theme)
         }
 
-        console.log(themePath)
-
         const stats = await stat(themePath)
             .catch(err => {
                 if (err.code !== 'ENOENT') {
