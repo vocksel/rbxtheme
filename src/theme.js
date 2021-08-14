@@ -158,7 +158,12 @@ const getThemeColors = (theme) => {
         let color
 
         for (const vscodeColor of vscodeColors) {
-            color = theme.colors[vscodeColor]
+            // TODO: Some default themes like Dark+ have an "include" field,
+            // which points to another theme files. Add support for that.
+
+            if (theme.colors) {
+                color = theme.colors[vscodeColor]
+            }
 
             if (!color) {
                 // The color doesn't exist in the root list of theme colors. Let's
