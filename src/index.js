@@ -7,8 +7,9 @@ import { stat, readFile } from 'fs/promises'
 import JSON5 from 'json5'
 import path from 'path'
 import { convert, getAvailableThemes, getThemeFromName, logArray } from './theme.js'
+import { fileURLToPath } from 'url'
 
-const __dirname = path.dirname(import.meta.url.substring(7))
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const pkg = JSON5.parse(await readFile(path.join(__dirname, '../package.json')))
 
 program
