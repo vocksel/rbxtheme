@@ -16,7 +16,7 @@ program
     .showHelpAfterError()
 
 program
-    .command('list', { isDefault: true })
+    .command('list')
     .description('Lists the names of the available themes. Use these names with the `convert` command to generate '
         + 'Studio themes.')
     .action(async () => {
