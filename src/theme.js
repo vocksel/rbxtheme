@@ -48,8 +48,6 @@ const getDefaultExtensionsDir = async () => {
                 }
             })
 
-        console.log(dir)
-
         if (stats) {
             return dir
         }
