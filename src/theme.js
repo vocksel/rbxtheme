@@ -21,7 +21,7 @@ const getScopeColors = (theme) => {
             let scopes = []
             if (Array.isArray(token.scope)) {
                 scopes = token.scope
-            } else {
+            } else if (token.scope) {
                 scopes = token.scope.split(',')
             }
 
