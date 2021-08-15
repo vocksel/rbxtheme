@@ -1,4 +1,4 @@
-import { getAvailableThemes, logArray } from '../theme.js'
+import { getAvailableThemes, logArray } from '../theme/index.js'
 
 const list = async () => {
     const themes = await getAvailableThemes()

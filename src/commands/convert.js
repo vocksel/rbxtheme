@@ -3,7 +3,7 @@
 import chalk from 'chalk'
 import clipboardy from 'clipboardy'
 import { stat } from 'fs/promises'
-import { convert as convertTheme, getThemeFromName } from '../theme.js'
+import { convert as convertTheme, getThemeFromName } from '../theme/index.js'
 
 const convert = async (theme, options, command) => {
     let themePath
