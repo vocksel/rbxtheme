@@ -4,7 +4,6 @@ about: Create a bug report for the "convert" command
 title: "[convert] "
 labels: bug
 assignees: vocksel
-
 ---
 
 ## Description
@@ -17,7 +16,7 @@ Please include a link to the theme you are trying to convert. This helps us reso
 
 ## Error messages
 
-Include any error messages you encountered when converting the theme. Screenshots or copy/pasting the error are both great!
+Include any error messages you encountered when running the command. Screenshots or copy/pasting the error are both great!
 
 ## NodeJS version
 
