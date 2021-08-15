@@ -6,14 +6,14 @@ labels: bug
 assignees: vocksel
 ---
 
-## Description
+**Description**
 
 Include a description of the bug you are encountering
 
-## Error messages
+**Error messages**
 
 Include any error messages you encountered when running the command. Screenshots or copy/pasting the error are both great!
 
-## NodeJS version
+**NodeJS version**
 
 Run `node --version` and include the result here
